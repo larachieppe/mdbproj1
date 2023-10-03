@@ -9,6 +9,11 @@ const names = Object.keys(nameToPic);
 
 export default function GameScreen() {
   // TODO: Declare and initialize state variables here, using "useState".
+  const [score, setScore] = useState(0);
+  const [name, setName] = useState([]);
+  const [total, setTotal] = useState(0);  
+  const [image, setImages] = useState("");
+  const [correctAnswer, setCorrect] = useState("");
 
   // State for the timer is handled for you.
   const [timeLeft, setTimeLeft] = useState(5000);
@@ -21,6 +26,8 @@ export default function GameScreen() {
     } else {
       // Time has expired
       // TODO: update appropriate state variables
+      setTotal(total + 1);
+      setTimeLeft(0);
     }
   };
 
@@ -29,16 +36,16 @@ export default function GameScreen() {
   const getNextRound = () => {
     // Fetches the next member name to guess.
     let correct = names[Math.floor(Math.random() * names.length)];
-    let correctName = nameToPic[correct][0];
+    let correctAnswer = nameToPic[correct][0];
     let correctImage = nameToPic[correct][1];
 
     // Generate 3 more wrong answers.
-    let nameOptions = [correctName];
+    let nameOptions = [correctAnswer];
     while (nameOptions.length < 4) {
       let wrong = names[Math.floor(Math.random() * names.length)];
-      let wrongName = nameToPic[wrong][0];
-      if (!nameOptions.includes(wrongName)) {
-        nameOptions.push(wrongName);
+      let wrongAnswer = nameToPic[wrong][0];
+      if (!nameOptions.includes(wrongAnswer)) {
+        nameOptions.push(wrongAnswer);
       }
     }
     nameOptions = shuffle(nameOptions);
@@ -46,11 +53,19 @@ export default function GameScreen() {
     // TODO: Update state here.
 
     setTimeLeft(5000);
+    setImages(correctImage);
+    setCorrect(correctAnswer);
+    setName(nameOptions)
   };
 
   // Called when user taps a name option.
   // TODO: Update correct # and total # state values.
-  const selectedNameChoice = (index) => {};
+  const selectedNameChoice = (index) => {
+    if (correctAnswer == name[index]) {
+      setScore(score + 1)
+    } 
+    setTotal(total + 1)
+  };
 
   // Call the countDown() method every 10 milliseconds.
   useEffect(() => {
@@ -68,6 +83,7 @@ export default function GameScreen() {
     },
     [
       /* TODO: Your State Variable Goes Here */
+      total
     ]
   );
 
@@ -84,6 +100,7 @@ export default function GameScreen() {
       >
         <Text style={styles.buttonText}>
           {/* TODO: Use something from state here. */}
+          {name[i]}
         </Text>
       </TouchableOpacity>
     );
@@ -98,6 +115,10 @@ export default function GameScreen() {
       {/* Hint: What does the nameButtons list above hold? 
           What types of objects is this list storing?
           Try to get a sense of what's going on in the for loop above. */}
+      <Text style={styles.scoreText}>Current Score: {score}/{total}</Text>
+      <Text style={styles.timerText}>Time Left: {timeLeft}</Text>
+      <Image style={styles.image} source={image}/> 
+      {nameButtons}
     </View>
   );
 }
